@@ -1,0 +1,38 @@
+.fundo{
+	width: 100%;
+	margin-top: 5%;
+	background-image: url("../img/fundo03.jpg");
+	background-repeat: no-repeat;
+	background-size:cover;
+	background-attachment: fixed;
+	
+}
+
+HEADER{
+	background-attachment: fixed;
+}
+
+a:link, a:visited {
+	text-decoration: none;
+	}
+a:hover {
+	text-decoration: underline; 
+	color: #f00;
+	}
+a:active {
+	text-decoration: none;
+}
+
+#canvas_area {
+	width: 960px;
+	margin-top: -10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+DIV.formulario{
+	padding-left: 34%;
+	padding-right: 34%;
+	text-align: center;
+	border-radius: 10px;
+}
