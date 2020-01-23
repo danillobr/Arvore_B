@@ -55,35 +55,35 @@ function No(ord) {
     }
 
     /*
-    add_key: adiciona uma chave à matriz de chaves do nó (na posição correta
+    adiciona_chave: adiciona uma chave à matriz de chaves do nó (na posição correta
          para manter a matriz ordenada).
          chave: o valor a ser adicionado.
      Retorna: a posição em que a chave foi inserida na matriz.
     */
-    this.add_key = function (key) {
+    this.adiciona_chave = function (chave) {
         var i = 0;
-        while (i < this.chaves.length && this.chaves[i] < key) i++;
-        this.chaves.splice(i, 0, key);
+        while (i < this.chaves.length && this.chaves[i] < chave) i++;
+        this.chaves.splice(i, 0, chave);
         return i;
     }
 
     /*
-    search: função recursiva para pesquisar o nó e seus filhos
+    buscar: função recursiva para pesquisar o nó e seus filhos
         pela presença de um valor.
         chave: valor a ser pesquisado.
     Retorna: o nó que contém a chave e o índice no diretório
         matriz de chaves ou [nulo, 0] se a chave não for encontrada.
     */
-    this.search = function (key) {
+    this.buscar = function (chave) {
         var i = 0;
         while (i < this.chaves.length) {
-            if (this.chaves[i] == key)
+            if (this.chaves[i] == chave)
                 return [this, i];
-            else if (this.chaves[i] > key) {
+            else if (this.chaves[i] > chave) {
                 if (this.folha())
                     return [null, 0];
                 else
-                    return this.filhos[i].search(key);
+                    return this.filhos[i].buscar(chave);
             }
             else
                 i++;
@@ -91,7 +91,7 @@ function No(ord) {
         if (this.folha())
             return [null, 0];
         else
-            return this.filhos[i].search(key);
+            return this.filhos[i].buscar(chave);
     }
 }
 
@@ -105,51 +105,51 @@ function ArvoreB(ord) {
     this.ordem = ord;
     this.raiz = new No(this.ordem);
     this.qtd_chaves = 0;
+
     this.x_offset = 0;
     this.y_offset = 0;
-
     /*
      inserir_chave: insere uma nova chave na árvore
      chave: a nova chave a ser inserida
      Retorna: o nó no qual a chave foi inserida.
     */
     this.inserir_chave = function (chave) {
-        var ins_No = this.find_leaf(this.raiz, key);
-        ins_No.add_key(chave);
-        while (ins_No.ultrapassou()) {
-            var up_val = ins_No.dividir();
-            var n_No = ins_No.filhos.pop();
-            if (ins_No.pai != null) {
-                ins_No = ins_No.pai;
-                var ind = ins_No.add_key(up_val);
-                ins_No.filhos.splice(ind + 1, 0, n_No);
-                n_No.pai = ins_No;
+        var ins_no = this.encontrar_folha(this.raiz, chave);
+        ins_no.adiciona_chave(chave);
+        while (ins_no.ultrapassou()) {
+            var chave_mediana_ins_no = ins_no.dividir();
+            var n_No = ins_no.filhos.pop();
+            if (ins_no.pai != null) {
+                ins_no = ins_no.pai;
+                var ind = ins_no.adiciona_chave(chave_mediana_ins_no);
+                ins_no.filhos.splice(ind + 1, 0, n_No);
+                n_No.pai = ins_no;
             }
             else {
                 this.raiz = new No(this.ordem);
-                this.raiz.add_key(up_val);
-                this.raiz.filhos.push(ins_No);
+                this.raiz.adiciona_chave(chave_mediana_ins_no);
+                this.raiz.filhos.push(ins_no);
                 this.raiz.filhos.push(n_No);
                 n_No.pai = this.raiz;
-                ins_No.pai = this.raiz;
-                ins_No = ins_No.pai;
+                ins_no.pai = this.raiz;
+                ins_no = ins_no.pai;
             }
         }
         this.qtd_chaves++;
     }
 
     /*
-     find_leaf: encontre o nó da folha correto para inserir uma chave.
+     encontrar_folha: encontre o nó da folha correto para inserir uma chave.
          nó: raiz da subárvore a ser pesquisada.
          chave: valor usado para encontrar um nó folha.
      Retorna: o nó folha no qual a chave deve ser inserida.
      */
-    this.find_leaf = function (No, chave) {
+    this.encontrar_folha = function (No, chave) {
         if (No.folha()) return No;
         else {
             var i = 0;
             while (i < No.chaves.length && No.chaves[i] < chave) i++;
-            return this.find_leaf(No.filhos[i], chave);
+            return this.encontrar_folha(No.filhos[i], chave);
         }
     }
 
@@ -159,7 +159,7 @@ function ArvoreB(ord) {
     Retorna: o nó que contém a chave e o índice no diretório da matriz de chaves ou [nulo, 0] se a chave não for encontrada.
     */
     this.search_key = function (chave) {
-        return this.raiz.search(chave)
+        return this.raiz.buscar(chave)
     }
 }
 
@@ -401,9 +401,8 @@ function DesenhaArvoreB(tree, canvas) {
 function on_botao_inserir_chave_clicked() {
     var chave = parseInt(document.getElementById("entrada_inserir_chave").value);
     if (chave || chave == 0) {
-        tree.inserir_chave(chave);
+        arvore.inserir_chave(chave);
         drawing.draw();
-        clear_error_message("insert");
     }
 }
 
@@ -413,7 +412,7 @@ function on_botao_buscar_chave_clicked() {
         alert("A chave deve ser um inteiro");
     else {
         var result, No, position;
-        result = tree.search_key(n);
+        result = arvore.search_key(n);
         No = result[0]; hl_position = result[1];
         if (No != null) {
             drawing.draw(centro_no, No, hl_position);
@@ -427,7 +426,7 @@ function on_botao_limpar_arvore_clicked() {
     nova_arvore(tree.ordem);
 }
 
-function on_botao_cria_nova_arvore_clicked() {
+function on_botao_criar_arvore_clicked() {
     var ordem = parseInt(document.getElementById("entrada_ordem").value)
     if (isNaN(ordem) || ordem < 3) {
         alert("Deve-se inserir um valor maior que 3!");
