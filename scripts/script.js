@@ -3,7 +3,7 @@ const largura_chave = 32; // Largura da chave
 const altura_chave = 32; // Altura  da chave
 const espaco_entre_nos = 32; // Espaçamento entre nós
 const deslocamento = 16; // Deslocamento de rolagem
-// Constantes para o método BTreeDrawing.draw
+// Constantes para o método DesenhaArvoreB.draw
 const centro_raiz = 0;
 const centro_no = 1;
 const rolagem = 2;
@@ -13,7 +13,7 @@ No: representa um nó em uma árvore b
      ord: a ordem da árvore à qual o nó pertence.
 */
 function No(ord) {
-    this.order = ord;
+    this.ordem = ord;
     this.pai = null; // o nó pai do nó (nulo para o nó raiz).
     this.chaves = []; // a matriz de chaves do nó.
     this.filhos = []; // matriz de nós filhos classificados do nó
@@ -24,34 +24,33 @@ function No(ord) {
     folha: verifica se o nó é uma folha.
     Retorna: true se o nó for uma folha, caso contrário, retona false
     */
-    this.leaf = function () {
+    this.folha = function () {
         return this.filhos.length == 0;
     }
 
     /*
-    estouro: verifica se o nó tem mais chaves do que a ordem permite
+    ultrapassou: verifica se o nó tem mais chaves do que a ordem permite
     Retorna: True se o nó tiver chaves em excesso.
     */
-    this.overflow = function () {
-        return this.order <= this.chaves.length;
+    this.ultrapassou = function () {
+        return this.ordem <= this.chaves.length;
     }
 
     /*
-    split: divide o nó em dois
+    dividir: divide o nó em dois
     Retorna: a chave mediana do nó original.
-    * nota: o novo nó é colocado no final do nó mais antigo
-            matriz de filhos.
+    * nota: o novo nó é colocado no final do nó mais antigo da matriz de filhos.
     */
-    this.split = function () {
-        var ind = Math.floor(this.order / 2) + 1;
-        var new_No = new No(this.order);
-        new_No.chaves = this.chaves.slice(ind);
-        new_No.filhos = this.filhos.slice(ind);
-        for (var x in new_No.filhos)
-            new_No.filhos[x].pai = new_No;
-        this.chaves = this.chaves.slice(0, ind);
-        this.filhos = this.filhos.slice(0, ind);
-        this.filhos.push(new_No);
+    this.dividir = function () {
+        var aux = Math.floor(this.ordem / 2) + 1;
+        var novo_no = new No(this.ordem);
+        novo_no.chaves = this.chaves.slice(aux);
+        novo_no.filhos = this.filhos.slice(aux);
+        for (var x in novo_no.filhos)
+            novo_no.filhos[x].pai = novo_no;
+        this.chaves = this.chaves.slice(0, aux);
+        this.filhos = this.filhos.slice(0, aux);
+        this.filhos.push(novo_no);
         return this.chaves.pop();
     }
 
@@ -81,7 +80,7 @@ function No(ord) {
             if (this.chaves[i] == key)
                 return [this, i];
             else if (this.chaves[i] > key) {
-                if (this.leaf())
+                if (this.folha())
                     return [null, 0];
                 else
                     return this.filhos[i].search(key);
@@ -89,7 +88,7 @@ function No(ord) {
             else
                 i++;
         }
-        if (this.leaf())
+        if (this.folha())
             return [null, 0];
         else
             return this.filhos[i].search(key);
@@ -97,28 +96,28 @@ function No(ord) {
 }
 
 /*
-BTree: uma árvore b.
-     order: a ordem da árvore.
+ArvoreB: uma árvore B.
+     ordem: a ordem da árvore.
      raiz: o nó raiz da árvore.
-     n_keys: número de chaves na árvore.
+     qtd_chaves: número de chaves na árvore.
 */
-function BTree(ord) {
-    this.order = ord;
-    this.root = new No(this.order);
-    this.n_keys = 0;
+function ArvoreB(ord) {
+    this.ordem = ord;
+    this.raiz = new No(this.ordem);
+    this.qtd_chaves = 0;
     this.x_offset = 0;
     this.y_offset = 0;
 
     /*
-     insert_key: insere uma nova chave na árvore
+     inserir_chave: insere uma nova chave na árvore
      chave: a nova chave a ser inserida
      Retorna: o nó no qual a chave foi inserida.
     */
-    this.insert_key = function (key) {
-        var ins_No = this.find_leaf(this.root, key);
-        ins_No.add_key(key);
-        while (ins_No.overflow()) {
-            var up_val = ins_No.split();
+    this.inserir_chave = function (chave) {
+        var ins_No = this.find_leaf(this.raiz, key);
+        ins_No.add_key(chave);
+        while (ins_No.ultrapassou()) {
+            var up_val = ins_No.dividir();
             var n_No = ins_No.filhos.pop();
             if (ins_No.pai != null) {
                 ins_No = ins_No.pai;
@@ -127,16 +126,16 @@ function BTree(ord) {
                 n_No.pai = ins_No;
             }
             else {
-                this.root = new No(this.order);
-                this.root.add_key(up_val);
-                this.root.filhos.push(ins_No);
-                this.root.filhos.push(n_No);
-                n_No.pai = this.root;
-                ins_No.pai = this.root;
+                this.raiz = new No(this.ordem);
+                this.raiz.add_key(up_val);
+                this.raiz.filhos.push(ins_No);
+                this.raiz.filhos.push(n_No);
+                n_No.pai = this.raiz;
+                ins_No.pai = this.raiz;
                 ins_No = ins_No.pai;
             }
         }
-        this.n_keys++;
+        this.qtd_chaves++;
     }
 
     /*
@@ -145,12 +144,12 @@ function BTree(ord) {
          chave: valor usado para encontrar um nó folha.
      Retorna: o nó folha no qual a chave deve ser inserida.
      */
-    this.find_leaf = function (No, key) {
-        if (No.leaf()) return No;
+    this.find_leaf = function (No, chave) {
+        if (No.folha()) return No;
         else {
             var i = 0;
-            while (i < No.chaves.length && No.chaves[i] < key) i++;
-            return this.find_leaf(No.filhos[i], key);
+            while (i < No.chaves.length && No.chaves[i] < chave) i++;
+            return this.find_leaf(No.filhos[i], chave);
         }
     }
 
@@ -159,17 +158,17 @@ function BTree(ord) {
     chave: o valor a ser pesquisado.
     Retorna: o nó que contém a chave e o índice no diretório da matriz de chaves ou [nulo, 0] se a chave não for encontrada.
     */
-    this.search_key = function (key) {
-        return this.root.search(key)
+    this.search_key = function (chave) {
+        return this.raiz.search(chave)
     }
 }
 
 /*
-BTreeDrawing: um desenho de um objeto BTree
-árvore: o BTree a ser representado
+DesenhaArvoreB: um desenho de um objeto ArvoreB
+árvore: o ArvoreB a ser representado
 tela: uma tela na qual a árvore será representada
 */
-function BTreeDrawing(tree, canvas) {
+function DesenhaArvoreB(tree, canvas) {
     this.tree = tree;
     this.canvas = canvas;
     this.context = canvas.getContext("2d");
@@ -203,7 +202,7 @@ function BTreeDrawing(tree, canvas) {
         context.font = "12px arial";
 
         // Centralize na raiz se centro_no for indefinido
-        // A raiz está centralizada de maneira diferente: no centro, na parte superior
+        // A raiz está centralizada de maneira diferente: no centro, na parte superior
         var deltas;
         if (mode != rolagem) {
             function get_delta_to_point(No, x, y) {
@@ -211,9 +210,9 @@ function BTreeDrawing(tree, canvas) {
                 return [x - No.x - middle, y - No.y - altura_chave / 2];
             }
 
-            this.position_tree(this.tree.root);
+            this.position_tree(this.tree.raiz);
             if (mode == centro_raiz)
-                deltas = get_delta_to_point(this.tree.root,
+                deltas = get_delta_to_point(this.tree.raiz,
                     canvas.width / 2,
                     deslocamento * 2 + 8);
             else if (mode == centro_no)
@@ -232,7 +231,7 @@ function BTreeDrawing(tree, canvas) {
                 arg2 = this.highlight[1];
             }
         }
-        this.draw_No(this.tree.root, context);
+        this.draw_No(this.tree.raiz, context);
 
         if (mode == centro_no) {
             context.lineWidth = 2;
@@ -347,7 +346,7 @@ function BTreeDrawing(tree, canvas) {
         if (No.filhos.length != 0) {
             cur_x = (cur_x == undefined) ? 0 : cur_x;
             // Ajuste a coordenada y para colocar o nó abaixo do seu
-            // pai
+            // pai
             if (pNo != undefined)
                 No.y = (pNo.y + altura_chave) + espaco_entre_nos;
             // Para cada criança ...
@@ -356,7 +355,7 @@ function BTreeDrawing(tree, canvas) {
                 child = No.filhos[i];
 
                 // Se não for uma folha, coloque o sutree em conformidade                
-                if (!child.leaf())
+                if (!child.folha())
                     this.position_tree(child, No, cur_x);
                 // Se é uma folha, disponha-a com base em seus irmãos
                 else {
@@ -367,7 +366,7 @@ function BTreeDrawing(tree, canvas) {
                 cur_x += this.get_tree_width(child) + espaco_entre_nos;
             }
             // Ajuste a coordenada x para centralizar acima dos filhos
-            if (!No.leaf()) {
+            if (!No.folha()) {
                 var first = No.filhos[0];
                 var last = No.filhos[No.filhos.length - 1];
                 var width = No.chaves.length * largura_chave;
@@ -386,7 +385,7 @@ function BTreeDrawing(tree, canvas) {
     */
     this.move_tree = function (delta_x, delta_y, No) {
         if (No == undefined) {
-            No = this.tree.root;
+            No = this.tree.raiz;
             this.offset_x += delta_x;
             this.offset_y += delta_y;
         }
@@ -399,16 +398,16 @@ function BTreeDrawing(tree, canvas) {
 }
 
 /* Manipuladores de eventos */
-function on_button_insert_clicked() {
-    var chave = parseInt(document.getElementById("insert_key").value);
+function on_botao_inserir_chave_clicked() {
+    var chave = parseInt(document.getElementById("entrada_inserir_chave").value);
     if (chave || chave == 0) {
-        tree.insert_key(chave);
+        tree.inserir_chave(chave);
         drawing.draw();
         clear_error_message("insert");
     }
 }
 
-function on_button_search_clicked() {
+function on_botao_buscar_chave_clicked() {
     var n = parseInt(document.getElementById("search_key").value);
     if (isNaN(n))
         alert("A chave deve ser um inteiro");
@@ -424,17 +423,17 @@ function on_button_search_clicked() {
     }
 }
 
-function on_button_clear_clicked() {
-    new_tree(tree.order);
+function on_botao_limpar_arvore_clicked() {
+    nova_arvore(tree.ordem);
 }
 
-function on_button_create_clicked() {
-    var order = parseInt(document.getElementById("entry_order").value)
-    if (isNaN(order) || order < 3) {
+function on_botao_cria_nova_arvore_clicked() {
+    var ordem = parseInt(document.getElementById("entrada_ordem").value)
+    if (isNaN(ordem) || ordem < 3) {
         alert("Deve-se inserir um valor maior que 3!");
         return;
     }
-    new_tree(order);
+    nova_arvore(ordem);
 }
 
 function on_canvas_clicked(e) {
@@ -482,21 +481,21 @@ function on_canvas_clicked(e) {
 }
 
 /* Cria uma nova árvore */
-function new_tree(order) {
-    tree = new BTree(order);
+function nova_arvore(ordem) {
+    arvore = new ArvoreB(ordem);
     var canvas = document.getElementById("canvas");
-    drawing = new BTreeDrawing(tree, canvas);
+    drawing = new DesenhaArvoreB(arvore, canvas);
     drawing.draw();
 }
 
 /* Libera os botões de inserir e remover chave para o uso */
-function liberar_botoes_inserir_e_remover_chave() {
-    var ordem = parseInt(document.getElementById("entry_order").value);
+function liberar_botoes() {
+    var ordem = parseInt(document.getElementById("entrada_ordem").value);
     if (ordem > 3) {
-        document.getElementById('input_inserir_chave').innerHTML =
+        document.getElementById('inserir_chave').innerHTML =
             '<div class="form-group">' +
-            '<input type="number" id="insert_key" name="insert_key" class="form-control" placeholder="chave">' +
+            '<input type="number" id="entrada_inserir_chave" name="entrada_inserir_chave" class="form-control" placeholder="chave">' +
             '</div>' +
-            '<button id="button_insert" onclick="on_button_insert_clicked()" class="btn btn-default">Inserir</button>';
+            '<button id="botao_inserir_chave" onclick="on_botao_inserir_chave_clicked()" class="btn btn-default">Inserir</button>';
     }
 }

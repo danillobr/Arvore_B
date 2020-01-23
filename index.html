@@ -34,14 +34,14 @@
               <div class="form-group">
                 <input type="text" id="search_key" name="search_key" class="form-control" placeholder="Chave">
               </div>
-              <button type="submit" id="button_search" onclick="on_button_search_clicked()"
+              <button type="submit" id="botao_buscar_chave" onclick="on_botao_buscar_chave_clicked()"
                 class="btn btn-default">Buscar Chave</button>
             </div>
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
               <li>
-                <a href="" onclick="on_button_clear_clicked()">Limpar Árvore<span class="caret"
-                    id="button_clear"></span></a>
+                <a href="" onclick="on_botao_limpar_arvore_clicked()">Limpar Árvore<span class="caret"
+                    id="botao_limpar_arvore"></span></a>
               </li>
               </li>
             </ul>
@@ -53,11 +53,11 @@
 
   <div class="navbar-form navbar-left formulario">
     <div class="form-group">
-      <input type="number" min="4" id="entry_order" name="entry_order" class="form-control" placeholder="Ordem">
+      <input type="number" min="4" id="entrada_ordem" name="entrada_ordem" class="form-control" placeholder="Ordem">
     </div>
-    <button id="button_create" onclick="on_button_create_clicked(), liberar_botoes_inserir_e_remover_chave()"
+    <button id="botao_criar_arvore" onclick="on_botao_criar_arvore_clicked(), liberar_botoes()"
       class="btn btn-default">Criar nova Árvore</button>
-    <div id="input_inserir_chave" style="padding: 2%;"></div>
+    <div id="inserir_chave" style="padding: 2%;"></div>
   </div>
 
   <div id="canvas_area">
