@@ -1,10 +1,6 @@
 <h1> Árvore B </h1>
 
-<hr/>
-
 Repositório destinado ao projeto da disciplina PAA utilizando JavaScript e o elemento HTML Canvas.
-
-<hr/>
 
 <h2>Funcionalidades :</h2>
 <ol>
