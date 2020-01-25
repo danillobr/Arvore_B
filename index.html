@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Árvore-B</title>
+  <title>Árvore B</title>
   <link rel="stylesheet" type="text/css" href="assets/css/style.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
     integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
@@ -27,7 +27,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.html">Árvore-B</a>
+            <a class="navbar-brand" href="index.html">Árvore B</a>
           </div>
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <div class="navbar-form navbar-left">
@@ -38,11 +38,9 @@
                 class="btn btn-default">Buscar Chave</button>
             </div>
             <ul class="nav navbar-nav navbar-right">
-              <li class="dropdown">
               <li>
-                <a href="" onclick="on_botao_limpar_arvore_clicked()">Limpar Árvore<span class="caret"
+                <a href="" onclick="on_botao_limpar_arvore_clicked()">Limpar Árvore<span
                     id="botao_limpar_arvore"></span></a>
-              </li>
               </li>
             </ul>
           </div>
@@ -53,9 +51,10 @@
 
   <div class="navbar-form navbar-left formulario">
     <div class="form-group">
-      <input type="number" min="4" id="entrada_ordem" name="entrada_ordem" class="form-control" placeholder="Ordem">
+      <input type="number" min="3" id="entrada_ordem" name="entrada_ordem" class="form-control" placeholder="Ordem">
     </div>
-    <button id="botao_criar_arvore" onclick="on_botao_criar_arvore_clicked(), liberar_botoes()" class="btn btn-default">Criar nova Árvore</button>
+    <button id="botao_criar_arvore" onclick="on_botao_criar_arvore_clicked(), liberar_botoes()"
+      class="btn btn-default">Criar nova Árvore</button>
     <div id="inserir_chave" style="padding: 2%;"></div>
   </div>
 

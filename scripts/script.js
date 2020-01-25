@@ -12,8 +12,8 @@ const rolagem = 2;
 No: representa um nó em uma árvore b
      ord: a ordem da árvore à qual o nó pertence.
 */
-function No(ord) {
-    this.ordem = ord;
+function No(ordem) {
+    this.ordem = ordem;
     this.pai = null; // o nó pai do nó (nulo para o nó raiz).
     this.chaves = []; // a matriz de chaves do nó.
     this.filhos = []; // matriz de nós filhos classificados do nó
@@ -42,14 +42,14 @@ function No(ord) {
     * nota: o novo nó é colocado no final do nó mais antigo da matriz de filhos.
     */
     this.dividir = function () {
-        var aux = Math.floor(this.ordem / 2) + 1;
+        var chave_centro = Math.floor(this.ordem / 2) + 1;
         var novo_no = new No(this.ordem);
-        novo_no.chaves = this.chaves.slice(aux);
-        novo_no.filhos = this.filhos.slice(aux);
+        novo_no.chaves = this.chaves.slice(chave_centro);
+        novo_no.filhos = this.filhos.slice(chave_centro);
         for (var x in novo_no.filhos)
             novo_no.filhos[x].pai = novo_no;
-        this.chaves = this.chaves.slice(0, aux);
-        this.filhos = this.filhos.slice(0, aux);
+        this.chaves = this.chaves.slice(0, chave_centro);
+        this.filhos = this.filhos.slice(0, chave_centro);
         this.filhos.push(novo_no);
         return this.chaves.pop();
     }
@@ -62,7 +62,9 @@ function No(ord) {
     */
     this.adiciona_chave = function (chave) {
         var i = 0;
-        while (i < this.chaves.length && this.chaves[i] < chave) i++;
+        while (i < this.chaves.length && this.chaves[i] < chave){
+            i++;
+        }
         this.chaves.splice(i, 0, chave);
         return i;
     }
@@ -77,8 +79,10 @@ function No(ord) {
     this.buscar = function (chave) {
         var i = 0;
         while (i < this.chaves.length) {
-            if (this.chaves[i] == chave)
+            if (this.chaves[i] == chave) {
+                x = this.chaves[i];
                 return [this, i];
+            }
             else if (this.chaves[i] > chave) {
                 if (this.folha())
                     return [null, 0];
@@ -99,57 +103,30 @@ function No(ord) {
 ArvoreB: uma árvore B.
      ordem: a ordem da árvore.
      raiz: o nó raiz da árvore.
-     qtd_chaves: número de chaves na árvore.
 */
-function ArvoreB(ord) {
-    this.ordem = ord;
+function ArvoreB(ordem) {
+    this.ordem = ordem;
     this.raiz = new No(this.ordem);
-    this.qtd_chaves = 0;
 
     this.x_deslocamento = 0;
     this.y_deslocamento = 0;
-    /*
-     inserir_chave: insere uma nova chave na árvore
-     chave: a nova chave a ser inserida
-     Retorna: o nó no qual a chave foi inserida.
-    */
-    this.inserir_chave = function (chave) {
-        var ins_no = this.encontrar_folha(this.raiz, chave);
-        ins_no.adiciona_chave(chave);
-        while (ins_no.ultrapassou()) {
-            var chave_mediana_ins_no = ins_no.dividir();
-            var n_No = ins_no.filhos.pop();
-            if (ins_no.pai != null) {
-                ins_no = ins_no.pai;
-                var ind = ins_no.adiciona_chave(chave_mediana_ins_no);
-                ins_no.filhos.splice(ind + 1, 0, n_No);
-                n_No.pai = ins_no;
-            }
-            else {
-                this.raiz = new No(this.ordem);
-                this.raiz.adiciona_chave(chave_mediana_ins_no);
-                this.raiz.filhos.push(ins_no);
-                this.raiz.filhos.push(n_No);
-                n_No.pai = this.raiz;
-                ins_no.pai = this.raiz;
-                ins_no = ins_no.pai;
-            }
-        }
-        this.qtd_chaves++;
-    }
 
     /*
-     encontrar_folha: encontre o nó da folha correto para inserir uma chave.
-         nó: raiz da subárvore a ser pesquisada.
-         chave: valor usado para encontrar um nó folha.
-     Retorna: o nó folha no qual a chave deve ser inserida.
-     */
-    this.encontrar_folha = function (No, chave) {
-        if (No.folha()) return No;
+         encontrar_folha: encontre o nó da folha correto para inserir uma chave.
+             nó: raiz da subárvore a ser pesquisada.
+             chave: valor usado para encontrar um nó folha.
+         Retorna: o nó folha no qual a chave deve ser inserida.
+         */
+    this.encontrar_folha = function (no, chave) {
+        if (no.folha()){
+            return no;
+        }
         else {
             var i = 0;
-            while (i < No.chaves.length && No.chaves[i] < chave) i++;
-            return this.encontrar_folha(No.filhos[i], chave);
+            while (no.chaves.length > i && chave > no.chaves[i]) {
+                i++;
+            }
+            return this.encontrar_folha(no.filhos[i], chave);
         }
     }
 
@@ -161,6 +138,66 @@ function ArvoreB(ord) {
     this.buscar_chave = function (chave) {
         return this.raiz.buscar(chave)
     }
+
+    /*
+     inserir_chave: insere uma nova chave na árvore
+     chave: a nova chave a ser inserida
+     Retorna: o nó no qual a chave foi inserida.
+    */
+    this.inserir_chave = function (chave) {
+        var insere_no = this.encontrar_folha(this.raiz, chave);
+        insere_no.adiciona_chave(chave);
+
+        while (insere_no.ultrapassou()) {
+            var chave_centro_insere_no = insere_no.dividir();
+            var insere_no_filhos = insere_no.filhos.pop();
+
+            if (insere_no.pai != null) {
+                insere_no = insere_no.pai;
+                var indice = insere_no.adiciona_chave(chave_centro_insere_no);
+                insere_no.filhos.splice(indice + 1, 0, insere_no_filhos);
+                insere_no_filhos.pai = insere_no;
+            } else {
+                this.raiz = new No(this.ordem);
+                this.raiz.adiciona_chave(chave_centro_insere_no);
+                this.raiz.filhos.push(insere_no);
+                this.raiz.filhos.push(insere_no_filhos);
+                insere_no_filhos.pai = this.raiz;
+                insere_no.pai = this.raiz;
+                insere_no = insere_no.pai;
+            }
+        }
+    }
+
+    /*
+     remover_chave: remove uma nova chave na árvore
+     chave: a chave a ser removida
+     Retorna: o nó no qual a chave foi removida.
+    */
+    // this.remover_chave = function (chave) {
+
+
+    //     var ins_no = this.encontrar_folha(this.raiz, chave);
+    //     ins_no.adiciona_chave(chave);
+    //     while (ins_no.ultrapassou()) {
+    //         var chave_mediana_ins_no = ins_no.dividir();
+    //         var n_No = ins_no.filhos.pop();
+    //         if (ins_no.pai != null) {
+    //             ins_no = ins_no.pai;
+    //             var ind = ins_no.adiciona_chave(chave_mediana_ins_no);
+    //             ins_no.filhos.splice(ind + 1, 0, n_No);
+    //             n_No.pai = ins_no;
+    //         } else {
+    //             this.raiz = new No(this.ordem);
+    //             this.raiz.adiciona_chave(chave_mediana_ins_no);
+    //             this.raiz.filhos.push(ins_no);
+    //             this.raiz.filhos.push(n_No);
+    //             n_No.pai = this.raiz;
+    //             ins_no.pai = this.raiz;
+    //             ins_no = ins_no.pai;
+    //         }
+    //     }
+    // }
 }
 
 /*
@@ -173,7 +210,6 @@ function DesenhaArvoreB(arvore, canvas) {
     this.canvas = canvas;
     this.contexto = canvas.getContext("2d");
     this.realcar = null;
-
 
     /*
     desenhar: (re) pinta a árvore
@@ -199,7 +235,8 @@ function DesenhaArvoreB(arvore, canvas) {
         contexto.clearRect(0, 0, canvas.width, canvas.height);
         contexto.textAlign = "center";
         contexto.textBaseline = "middle";
-        contexto.font = "12px arial";
+        
+        contexto.font = "18px arial";
 
         // Centralize na raiz se centro_no for indefinido
         // A raiz está centralizada de maneira diferente: no centro, na parte superior
@@ -236,14 +273,14 @@ function DesenhaArvoreB(arvore, canvas) {
 
         if (modo == centro_no) {
             contexto.lineWidth = 2;
-            contexto.strokeStyle = "#F57900"; // lembrete: cor laranja
+            contexto.strokeStyle = "red"; // lembrete: cor vermelho
             contexto.strokeRect(arg1.x + arg2 * largura_chave,
                 arg1.y, largura_chave, altura_chave);
             this.realcar = [arg1, arg2];
         }
 
         // (Re) desenhe o quadro da tela
-        contexto.fillStyle = "#555753"; // lembrete: cor Alumínio
+        contexto.fillStyle = "#000000"; // lembrete: cor Alumínio
         contexto.beginPath();
         // Seta superior
         contexto.clearRect(0, 0, canvas.width, deslocamento + 4);
@@ -284,32 +321,32 @@ function DesenhaArvoreB(arvore, canvas) {
          nó: o nó que será desenhado
     Devoluções: -
     */
-    this.desenhar_no = function (No) {
+    this.desenhar_no = function (no) {
         // Localize variáveis para facilitar o acesso
         var contexto = this.contexto;
 
         // Desenha o nó
         contexto.lineWidth = 2;
-        contexto.strokeStyle = "#729FCF"; // lembrete: azul céu
+        contexto.strokeStyle = "#000000"; // lembrete: preto
         contexto.fillStyle = "#000000";
 
         var chave;
         var passo = largura_chave;
-        for (var i = 0; i < No.chaves.length; i++) {
-            chave = No.chaves[i];
-            contexto.strokeRect(No.x + i * passo, No.y, largura_chave, altura_chave);
-            contexto.fillText(chave, (No.x + i * passo) + (largura_chave / 2),
-                No.y + (altura_chave / 2));
+        for (var i = 0; i < no.chaves.length; i++) {
+            chave = no.chaves[i];
+            contexto.strokeRect(no.x + i * passo, no.y, largura_chave, altura_chave);
+            contexto.fillText(chave, (no.x + i * passo) + (largura_chave / 2),
+                no.y + (altura_chave / 2));
         }
 
         // Desenhar e conectar os filhos
         var filho;
-        contexto.strokeStyle = "#73D216"; // lembrete: cor verde qualquer
-        for (var i = 0; i < No.filhos.length; i++) {
+        contexto.strokeStyle = "#000000"; // lembrete: cor preto
+        for (var i = 0; i < no.filhos.length; i++) {
             contexto.beginPath();
-            filho = No.filhos[i];
+            filho = no.filhos[i];
             this.desenhar_no(filho, contexto);
-            contexto.moveTo(No.x + i * passo, No.y + altura_chave);
+            contexto.moveTo(no.x + i * passo, no.y + altura_chave);
             contexto.lineTo(filho.x + ((filho.chaves.length * largura_chave) / 2),
                 filho.y - 1);
             contexto.lineWidth = 1;
@@ -414,6 +451,7 @@ function on_botao_buscar_chave_clicked() {
     else {
         var resultado, no, posicao;
         resultado = arvore.buscar_chave(chave);
+        var xx = resultado[0];
         no = resultado[0]; posicao = resultado[1];
         if (no != null) {
             desenho.desenhar(centro_no, no, posicao);
@@ -430,7 +468,7 @@ function on_botao_limpar_arvore_clicked() {
 function on_botao_criar_arvore_clicked() {
     var ordem = parseInt(document.getElementById("entrada_ordem").value)
     if (isNaN(ordem) || ordem < 3) {
-        alert("Deve-se inserir um valor maior que 3!");
+        alert("Deve-se inserir um valor maior ou igual a 3!");
         return;
     }
     nova_arvore(ordem);
@@ -491,7 +529,7 @@ function nova_arvore(ordem) {
 /* Libera os botões de inserir e remover chave para o uso */
 function liberar_botoes() {
     var ordem = parseInt(document.getElementById("entrada_ordem").value);
-    if (ordem > 3) {
+    if (ordem >= 3) {
         document.getElementById('inserir_chave').innerHTML =
             '<div class="form-group">' +
             '<input type="number" id="entrada_inserir_chave" name="entrada_inserir_chave" class="form-control" placeholder="chave">' +
