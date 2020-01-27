@@ -214,9 +214,9 @@ function ArvoreB(ordem) {
         remove_nesse_no = resultado[0];
         posicao = resultado[1];
 
-        if (remove_nesse_no.folha() && taxa_ocupacao <= remove_nesse_no.chaves.length) {
+        if (remove_nesse_no.folha() && taxa_ocupacao < remove_nesse_no.chaves.length) {
             remove_nesse_no.remove_chave(chave);
-        }else{
+        } else {
             alert("A chave não pode ser removida, pois o nó em que ela se encontra não é folha e/ou já está com o limite minimo de chaves no nó.");
         }
     }
