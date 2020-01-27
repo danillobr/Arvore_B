@@ -62,10 +62,25 @@ function No(ordem) {
     */
     this.adiciona_chave = function (chave) {
         var i = 0;
-        while (i < this.chaves.length && this.chaves[i] < chave){
+        while (i < this.chaves.length && this.chaves[i] < chave) {
             i++;
         }
         this.chaves.splice(i, 0, chave);
+        return i;
+    }
+
+    /*
+    remove_chave: remove uma chave à matriz de chaves do nó (na posição correta
+         para manter a matriz ordenada).
+         chave: o valor a ser adicionado.
+     Retorna: a posição em que a chave foi removida na matriz.
+    */
+    this.remove_chave = function (chave) {
+        var i = 0;
+        while (i < this.chaves.length && this.chaves[i] < chave) {
+            i++;
+        }
+        this.chaves.splice(i, 1);
         return i;
     }
 
@@ -118,7 +133,26 @@ function ArvoreB(ordem) {
          Retorna: o nó folha no qual a chave deve ser inserida.
          */
     this.encontrar_folha = function (no, chave) {
-        if (no.folha()){
+        if (no.folha()) {
+            return no;
+        }
+        else {
+            var i = 0;
+            while (no.chaves.length > i && chave > no.chaves[i]) {
+                i++;
+            }
+            return this.encontrar_folha(no.filhos[i], chave);
+        }
+    }
+
+    /*
+         encontrar_folha: encontre o nó da folha correto para inserir uma chave.
+             nó: raiz da subárvore a ser pesquisada.
+             chave: valor usado para encontrar um nó folha.
+         Retorna: o nó folha no qual a chave deve ser inserida.
+         */
+    this.encontrar_tipo_no = function (no, chave) {
+        if (no.folha()) {
             return no;
         }
         else {
@@ -145,59 +179,47 @@ function ArvoreB(ordem) {
      Retorna: o nó no qual a chave foi inserida.
     */
     this.inserir_chave = function (chave) {
-        var insere_no = this.encontrar_folha(this.raiz, chave);
-        insere_no.adiciona_chave(chave);
+        var insere_nesse_no = this.encontrar_folha(this.raiz, chave);
+        insere_nesse_no.adiciona_chave(chave);
 
-        while (insere_no.ultrapassou()) {
-            var chave_centro_insere_no = insere_no.dividir();
-            var insere_no_filhos = insere_no.filhos.pop();
+        while (insere_nesse_no.ultrapassou()) {
+            var chave_centro_insere_nesse_no = insere_nesse_no.dividir();
+            var insere_no_filhos = insere_nesse_no.filhos.pop();
 
-            if (insere_no.pai != null) {
-                insere_no = insere_no.pai;
-                var indice = insere_no.adiciona_chave(chave_centro_insere_no);
-                insere_no.filhos.splice(indice + 1, 0, insere_no_filhos);
-                insere_no_filhos.pai = insere_no;
+            if (insere_nesse_no.pai != null) {
+                insere_nesse_no = insere_nesse_no.pai;
+                var indice = insere_nesse_no.adiciona_chave(chave_centro_insere_nesse_no);
+                insere_nesse_no.filhos.splice(indice + 1, 0, insere_no_filhos);
+                insere_no_filhos.pai = insere_nesse_no;
             } else {
                 this.raiz = new No(this.ordem);
-                this.raiz.adiciona_chave(chave_centro_insere_no);
-                this.raiz.filhos.push(insere_no);
+                this.raiz.adiciona_chave(chave_centro_insere_nesse_no);
+                this.raiz.filhos.push(insere_nesse_no);
                 this.raiz.filhos.push(insere_no_filhos);
                 insere_no_filhos.pai = this.raiz;
-                insere_no.pai = this.raiz;
-                insere_no = insere_no.pai;
+                insere_nesse_no.pai = this.raiz;
+                insere_nesse_no = insere_nesse_no.pai;
             }
         }
     }
 
     /*
-     remover_chave: remove uma nova chave na árvore
-     chave: a chave a ser removida
-     Retorna: o nó no qual a chave foi removida.
-    */
-    // this.remover_chave = function (chave) {
+     remover_chave: remove uma nova chave na árvore
+     chave: a chave a ser removida
+     Retorna: o nó no qual a chave foi removida.
+    */
+    this.remover_chave = function (chave) {
+        var taxa_ocupacao = Math.round(this.ordem / 2) - 1;
+        var resultado = this.buscar_chave(chave);
+        remove_nesse_no = resultado[0];
+        posicao = resultado[1];
 
-
-    //     var ins_no = this.encontrar_folha(this.raiz, chave);
-    //     ins_no.adiciona_chave(chave);
-    //     while (ins_no.ultrapassou()) {
-    //         var chave_mediana_ins_no = ins_no.dividir();
-    //         var n_No = ins_no.filhos.pop();
-    //         if (ins_no.pai != null) {
-    //             ins_no = ins_no.pai;
-    //             var ind = ins_no.adiciona_chave(chave_mediana_ins_no);
-    //             ins_no.filhos.splice(ind + 1, 0, n_No);
-    //             n_No.pai = ins_no;
-    //         } else {
-    //             this.raiz = new No(this.ordem);
-    //             this.raiz.adiciona_chave(chave_mediana_ins_no);
-    //             this.raiz.filhos.push(ins_no);
-    //             this.raiz.filhos.push(n_No);
-    //             n_No.pai = this.raiz;
-    //             ins_no.pai = this.raiz;
-    //             ins_no = ins_no.pai;
-    //         }
-    //     }
-    // }
+        if (remove_nesse_no.folha() && taxa_ocupacao <= remove_nesse_no.chaves.length) {
+            remove_nesse_no.remove_chave(chave);
+        }else{
+            alert("A chave não pode ser removida, pois o nó em que ela se encontra não é folha e/ou já está com o limite minimo de chaves no nó.");
+        }
+    }
 }
 
 /*
@@ -235,7 +257,7 @@ function DesenhaArvoreB(arvore, canvas) {
         contexto.clearRect(0, 0, canvas.width, canvas.height);
         contexto.textAlign = "center";
         contexto.textBaseline = "middle";
-        
+
         contexto.font = "18px arial";
 
         // Centralize na raiz se centro_no for indefinido
@@ -444,6 +466,14 @@ function on_botao_inserir_chave_clicked() {
     }
 }
 
+function on_botao_remover_chave_clicked() {
+    var chave = parseInt(document.getElementById("entrada_remover_chave").value);
+    if (chave || chave == 0) {
+        arvore.remover_chave(chave);
+        desenho.desenhar();
+    }
+}
+
 function on_botao_buscar_chave_clicked() {
     var chave = parseInt(document.getElementById("buscar_chave").value);
     if (isNaN(chave))
@@ -535,5 +565,11 @@ function liberar_botoes() {
             '<input type="number" id="entrada_inserir_chave" name="entrada_inserir_chave" class="form-control" placeholder="chave">' +
             '</div>' +
             '<button id="botao_inserir_chave" onclick="on_botao_inserir_chave_clicked()" class="btn btn-default">Inserir</button>';
+        document.getElementById('remover_chave').innerHTML =
+            '<div class="form-group">' +
+            '<input type="number" id="entrada_remover_chave" name="entrada_remover_chave" class="form-control" placeholder="chave">' +
+            '</div>' +
+            '<button id="botao_remover_chave" onclick="on_botao_remover_chave_clicked()" class="btn btn-default">Remover</button>';
+
     }
 }
