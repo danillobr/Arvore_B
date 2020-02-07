@@ -1,22 +1,14 @@
-<h1> Árvore B </h1>
+# Árvore B
+    Repositório destinado ao projeto de implementação da Árvore B na disciplina de PAA.
 
-Repositório destinado ao projeto da disciplina PAA utilizando JavaScript e o elemento HTML Canvas.
+## Funcionalidades implementadas:
+  * Criar árvore
+  * Inserir chave
+  * Remover chave
+  * Buscar chave
+  * Limpar árvore
 
-<h2>Funcionalidades :</h2>
-<ol>
-  <li>
-    Criar árvore
-  </li>
-  <li>
-    Inserir chaves
-  </li>
-  <li>
-    Remover chaves
-  </li>
-  <li>
-    Buscar chave
-  </li>
-  <li>
-    Limpar árvore
-  </li>
-</ol>
+
+## Tecnologia utilizadas:
+  * JavaScript
+  * Elemento HMTL Canvas
