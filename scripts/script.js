@@ -137,7 +137,7 @@ function ArvoreB(ordem) {
         }
     }
 
-    // Remove uma chave que esteja em um nó folha que esteja com a taxa de ocupação acima dos 50%, retornando a chave removida.
+    // Remove uma chave que esteja em um nó folha e com a taxa de ocupação acima dos 50%, retornando a chave removida.
     this.remover_chave = function (chave) {
         var taxa_ocupacao = Math.round(this.ordem / 2) - 1;
         var resultado = this.buscar_chave(chave);
