@@ -11,7 +11,7 @@ function No(ordem) {
     this.pai = null; // Referência do pai do nó, null para a raiz.
     this.chaves = []; // Matriz de chaves do nó.
     this.filhos = []; // Matriz de nós filhos.
-    
+
     // Configurações dos eixos x e y do nó na tela.
     this.x = 0;
     this.y = 0;
@@ -21,12 +21,12 @@ function No(ordem) {
         return this.filhos.length == 0;
     }
 
-   // Verifica se o nó tem mais chaves do que é permitido, retorna "True" se tiver ultrapassado ou "False".
+    // Verifica se o nó tem mais chaves do que é permitido, retorna "True" se tiver ultrapassado ou "False".
     this.ultrapassou = function () {
         return this.ordem <= this.chaves.length;
     }
 
-   // Divide o nó em dois e retorna a chave mediana do nó original. O novo nó é colocado no final do nó mais antigo da matriz de filhos.
+    // Divide o nó em dois e retorna a chave mediana do nó original. O novo nó é colocado no final do nó mais antigo da matriz de filhos.
     this.dividir = function () {
         var chave_centro = Math.floor(this.ordem / 2) + 1;
         var novo_no = new No(this.ordem);
@@ -40,7 +40,7 @@ function No(ordem) {
         return this.chaves.pop();
     }
 
-   // Adiciona uma nova chave no nó e retorna a posição em que a chave foi inserida.
+    // Adiciona uma nova chave no nó e retorna a posição em que a chave foi inserida.
     this.adiciona_chave = function (chave) {
         var i = 0;
         while (i < this.chaves.length && this.chaves[i] < chave) {
@@ -50,7 +50,7 @@ function No(ordem) {
         return i;
     }
 
-   // Remove uma chave do nó e retorna a posição em que a chave foi removida.
+    // Remove uma chave do nó e retorna a posição em que a chave foi removida.
     this.remove_chave = function (chave) {
         var i = 0;
         while (i < this.chaves.length && this.chaves[i] < chave) {
@@ -60,7 +60,7 @@ function No(ordem) {
         return i;
     }
 
-   // Busca por uma chave na árvore e retorna o nó que contém a chave e o índice dela no nó, retona [null, 0] se a chave não for encontrada.
+    // Busca por uma chave na árvore e retorna o nó que contém a chave e o índice dela no nó, retona [null, 0] se a chave não for encontrada.
     this.buscar = function (chave) {
         var i = 0;
         while (i < this.chaves.length) {
@@ -106,39 +106,12 @@ function ArvoreB(ordem) {
         }
     }
 
-    /*
-         encontrar_folha: encontre o nó da folha correto para inserir uma chave.
-             nó: raiz da subárvore a ser pesquisada.
-             chave: valor usado para encontrar um nó folha.
-         Retorna: o nó folha no qual a chave deve ser inserida.
-         */
-    this.encontrar_tipo_no = function (no, chave) {
-        if (no.folha()) {
-            return no;
-        }
-        else {
-            var i = 0;
-            while (no.chaves.length > i && chave > no.chaves[i]) {
-                i++;
-            }
-            return this.encontrar_folha(no.filhos[i], chave);
-        }
-    }
-
-    /*
-    buscar_chave: pesquisa a existência e posição de uma chave na árvore
-    chave: o valor a ser pesquisado.
-    Retorna: o nó que contém a chave e o índice no diretório da matriz de chaves ou [nulo, 0] se a chave não for encontrada.
-    */
+    // Busca por uma chave a partir de um valor informado, começando pela raiz da árvore.
     this.buscar_chave = function (chave) {
         return this.raiz.buscar(chave)
     }
 
-    /*
-     inserir_chave: insere uma nova chave na árvore
-     chave: a nova chave a ser inserida
-     Retorna: o nó no qual a chave foi inserida.
-    */
+    // Insere a nova chave na árvore, retornando o nó onde a chave foi inserida.
     this.inserir_chave = function (chave) {
         var insere_nesse_no = this.encontrar_folha(this.raiz, chave);
         insere_nesse_no.adiciona_chave(chave);
@@ -164,11 +137,7 @@ function ArvoreB(ordem) {
         }
     }
 
-    /*
-     remover_chave: remove uma nova chave na árvore
-     chave: a chave a ser removida
-     Retorna: o nó no qual a chave foi removida.
-    */
+    // Remove uma chave que esteja em um nó folha que esteja com a taxa de ocupação acima dos 50%, retornando a chave removida.
     this.remover_chave = function (chave) {
         var taxa_ocupacao = Math.round(this.ordem / 2) - 1;
         var resultado = this.buscar_chave(chave);
