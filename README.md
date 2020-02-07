@@ -2,7 +2,7 @@
 
 ## Informações do projeto
 
-### Descrição
+### Descrição:
 Repositório destinado ao projeto de implementação da Árvore B na disciplina de PAA.
 
 ### Funcionalidades implementadas:
