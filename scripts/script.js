@@ -1,46 +1,32 @@
-// Constantes
-const largura_chave = 32; // Largura da chave
-const altura_chave = 32; // Altura  da chave
-const espaco_entre_nos = 32; // Espaçamento entre nós
-const deslocamento = 16; // Deslocamento de rolagem
-// Constantes para o método DesenhaArvoreB.draw
+const largura_chave = 32;
+const altura_chave = 32;
+const espaco_entre_nos = 32;
+const deslocamento = 16;
 const centro_raiz = 0;
 const centro_no = 1;
 const rolagem = 2;
 
-/*
-No: representa um nó em uma árvore b
-     ord: a ordem da árvore à qual o nó pertence.
-*/
 function No(ordem) {
     this.ordem = ordem;
-    this.pai = null; // o nó pai do nó (nulo para o nó raiz).
-    this.chaves = []; // a matriz de chaves do nó.
-    this.filhos = []; // matriz de nós filhos classificados do nó
-    this.x = 0; // coordenada x do nó na tela
-    this.y = 0; // coordenada y do nó na tela
+    this.pai = null; // Referência do pai do nó, null para a raiz.
+    this.chaves = []; // Matriz de chaves do nó.
+    this.filhos = []; // Matriz de nós filhos.
+    
+    // Configurações dos eixos x e y do nó na tela.
+    this.x = 0;
+    this.y = 0;
 
-    /*
-    folha: verifica se o nó é uma folha.
-    Retorna: true se o nó for uma folha, caso contrário, retona false
-    */
+    // Verifica se um nó é uma folha, retorna "True" ou "False".
     this.folha = function () {
         return this.filhos.length == 0;
     }
 
-    /*
-    ultrapassou: verifica se o nó tem mais chaves do que a ordem permite
-    Retorna: True se o nó tiver chaves em excesso.
-    */
+   // Verifica se o nó tem mais chaves do que é permitido, retorna "True" se tiver ultrapassado ou "False".
     this.ultrapassou = function () {
         return this.ordem <= this.chaves.length;
     }
 
-    /*
-    dividir: divide o nó em dois
-    Retorna: a chave mediana do nó original.
-    * nota: o novo nó é colocado no final do nó mais antigo da matriz de filhos.
-    */
+   // Divide o nó em dois e retorna a chave mediana do nó original. O novo nó é colocado no final do nó mais antigo da matriz de filhos.
     this.dividir = function () {
         var chave_centro = Math.floor(this.ordem / 2) + 1;
         var novo_no = new No(this.ordem);
@@ -54,12 +40,7 @@ function No(ordem) {
         return this.chaves.pop();
     }
 
-    /*
-    adiciona_chave: adiciona uma chave à matriz de chaves do nó (na posição correta
-         para manter a matriz ordenada).
-         chave: o valor a ser adicionado.
-     Retorna: a posição em que a chave foi inserida na matriz.
-    */
+   // Adiciona uma nova chave no nó e retorna a posição em que a chave foi inserida.
     this.adiciona_chave = function (chave) {
         var i = 0;
         while (i < this.chaves.length && this.chaves[i] < chave) {
@@ -69,12 +50,7 @@ function No(ordem) {
         return i;
     }
 
-    /*
-    remove_chave: remove uma chave à matriz de chaves do nó (na posição correta
-         para manter a matriz ordenada).
-         chave: o valor a ser adicionado.
-     Retorna: a posição em que a chave foi removida na matriz.
-    */
+   // Remove uma chave do nó e retorna a posição em que a chave foi removida.
     this.remove_chave = function (chave) {
         var i = 0;
         while (i < this.chaves.length && this.chaves[i] < chave) {
@@ -84,13 +60,7 @@ function No(ordem) {
         return i;
     }
 
-    /*
-    buscar: função recursiva para pesquisar o nó e seus filhos
-        pela presença de um valor.
-        chave: valor a ser pesquisado.
-    Retorna: o nó que contém a chave e o índice no diretório
-        matriz de chaves ou [nulo, 0] se a chave não for encontrada.
-    */
+   // Busca por uma chave na árvore e retorna o nó que contém a chave e o índice dela no nó, retona [null, 0] se a chave não for encontrada.
     this.buscar = function (chave) {
         var i = 0;
         while (i < this.chaves.length) {
@@ -114,24 +84,15 @@ function No(ordem) {
     }
 }
 
-/*
-ArvoreB: uma árvore B.
-     ordem: a ordem da árvore.
-     raiz: o nó raiz da árvore.
-*/
 function ArvoreB(ordem) {
     this.ordem = ordem;
     this.raiz = new No(this.ordem);
 
+    // Configurações dos eixos x e y do nó na tela.
     this.x_deslocamento = 0;
     this.y_deslocamento = 0;
 
-    /*
-         encontrar_folha: encontre o nó da folha correto para inserir uma chave.
-             nó: raiz da subárvore a ser pesquisada.
-             chave: valor usado para encontrar um nó folha.
-         Retorna: o nó folha no qual a chave deve ser inserida.
-         */
+    // Procura por um nó folha para realizar a inserção, retorna o nó folha no qual a chave deve ser inserida.
     this.encontrar_folha = function (no, chave) {
         if (no.folha()) {
             return no;
@@ -222,34 +183,16 @@ function ArvoreB(ordem) {
     }
 }
 
-/*
-DesenhaArvoreB: um desenho de um objeto ArvoreB
-árvore: o ArvoreB a ser representado
-tela: uma tela na qual a árvore será representada
-*/
 function DesenhaArvoreB(arvore, canvas) {
     this.arvore = arvore;
     this.canvas = canvas;
     this.contexto = canvas.getContext("2d");
     this.realcar = null;
 
-    /*
-    desenhar: (re) pinta a árvore
-         modo: descreve o motivo do (re) desenho
-         centro_raiz: centralizando a raiz na parte superior
-         centro_no: centralizar totalmente um nó e, opcionalmente, destacando-o
-         rolagem: rolando a árvore, mova-a
-         Para cada modo, arg1 e arg2 assumem valores diferentes:
-            centro_raiz: arg1 e arg2 não são usados;
-            centro_no: arg1 é o nó central e arg2 é a chave de destaque
-         rolagem: arg1 é o delta x e arg2 é o delta y
-     Devoluções: -
-    */
     this.desenhar = function (modo, arg1, arg2) {
         if (modo == undefined)
             modo = centro_raiz;
 
-        // Localize variáveis para facilitar o acesso
         var canvas = this.canvas;
         var contexto = this.contexto;
 
@@ -260,8 +203,6 @@ function DesenhaArvoreB(arvore, canvas) {
 
         contexto.font = "18px arial";
 
-        // Centralize na raiz se centro_no for indefinido
-        // A raiz está centralizada de maneira diferente: no centro, na parte superior
         var deltas;
         if (modo != rolagem) {
             function pegar_pontos_do_delta(No, x, y) {
@@ -283,7 +224,6 @@ function DesenhaArvoreB(arvore, canvas) {
         }
         else {
             this.mover_arvore(arg1 * 5, arg2 * 5);
-            // Se estiver rolando, mantenha o realce
             if (this.realcar != null) {
                 modo = centro_no;
                 arg1 = this.realcar[0];
@@ -295,28 +235,24 @@ function DesenhaArvoreB(arvore, canvas) {
 
         if (modo == centro_no) {
             contexto.lineWidth = 2;
-            contexto.strokeStyle = "red"; // lembrete: cor vermelho
+            contexto.strokeStyle = "red";
             contexto.strokeRect(arg1.x + arg2 * largura_chave,
                 arg1.y, largura_chave, altura_chave);
             this.realcar = [arg1, arg2];
         }
 
-        // (Re) desenhe o quadro da tela
-        contexto.fillStyle = "#000000"; // lembrete: cor Alumínio
+        contexto.fillStyle = "#000000";
         contexto.beginPath();
-        // Seta superior
         contexto.clearRect(0, 0, canvas.width, deslocamento + 4);
         contexto.moveTo(canvas.width / 2, 0);
         contexto.lineTo((canvas.width / 2) - (deslocamento / 2), deslocamento);
         contexto.lineTo((canvas.width / 2) + (deslocamento / 2), deslocamento);
 
-        // Seta da esquerda
         contexto.clearRect(0, 0, deslocamento + 4, canvas.height);
         contexto.moveTo(0, canvas.height / 2);
         contexto.lineTo(deslocamento, canvas.height / 2 + (deslocamento / 2));
         contexto.lineTo(deslocamento, canvas.height / 2 - (deslocamento / 2));
 
-        // Seta de inferior
         contexto.clearRect(0, canvas.height - deslocamento - 4,
             canvas.width, canvas.height);
         contexto.moveTo(canvas.width / 2, canvas.height);
@@ -325,7 +261,6 @@ function DesenhaArvoreB(arvore, canvas) {
         contexto.lineTo((canvas.width / 2) + (deslocamento / 2),
             canvas.height - deslocamento);
 
-        // Seta da direita
         contexto.clearRect(canvas.width - deslocamento - 4, 0,
             canvas.width, canvas.height);
         contexto.moveTo(canvas.width, canvas.height / 2);
@@ -338,18 +273,11 @@ function DesenhaArvoreB(arvore, canvas) {
         contexto.fill();
     }
 
-    /*
-    desenhar_no: desenha uma árvore enraizada no nó fornecido em um contexto de tela.
-         nó: o nó que será desenhado
-    Devoluções: -
-    */
     this.desenhar_no = function (no) {
-        // Localize variáveis para facilitar o acesso
         var contexto = this.contexto;
 
-        // Desenha o nó
         contexto.lineWidth = 2;
-        contexto.strokeStyle = "#000000"; // lembrete: preto
+        contexto.strokeStyle = "#000000";
         contexto.fillStyle = "#000000";
 
         var chave;
@@ -361,9 +289,8 @@ function DesenhaArvoreB(arvore, canvas) {
                 no.y + (altura_chave / 2));
         }
 
-        // Desenhar e conectar os filhos
         var filho;
-        contexto.strokeStyle = "#000000"; // lembrete: cor preto
+        contexto.strokeStyle = "#000000";
         for (var i = 0; i < no.filhos.length; i++) {
             contexto.beginPath();
             filho = no.filhos[i];
@@ -377,11 +304,6 @@ function DesenhaArvoreB(arvore, canvas) {
         }
     }
 
-    /*
-    pegar_largura_arvore: calcula a largura de uma árvore com base na extremidade esquerda e filhos mais à direita.
-    nó: a raiz da árvore cuja largura será calculada
-    Retorna: a largura da árvore.
-    */
     this.pegar_largura_arvore = function (no) {
         if (no.filhos.length > 0) {
             var lm = no.filhos[0];
@@ -395,37 +317,22 @@ function DesenhaArvoreB(arvore, canvas) {
         return largura_chave * no.chaves.length;
     }
 
-    /*
-    posicao_arvore: coloque uma árvore para desenhar.
-         no: a raiz da árvore a ser apresentada
-         no_pai: o nó pai (o padrão é indefinido)
-         cur_x: a coordenada x atual (o padrão é 0)
-    Devoluções: -
-    */
     this.posicao_arvore = function (no, no_pai, cur_x) {
         if (no.filhos.length != 0) {
             cur_x = (cur_x == undefined) ? 0 : cur_x;
-            // Ajuste a coordenada y para colocar o nó abaixo do seu
-            // pai
             if (no_pai != undefined)
                 no.y = (no_pai.y + altura_chave) + espaco_entre_nos;
-            // Para cada criança ...
             var filho;
             for (var i = 0; i < no.filhos.length; i++) {
                 filho = no.filhos[i];
-
-                // Se não for uma folha, coloque o sutree em conformidade                
                 if (!filho.folha())
                     this.posicao_arvore(filho, no, cur_x);
-                // Se é uma folha, disponha-a com base em seus irmãos
                 else {
                     filho.x = cur_x;
                     filho.y = no.y + altura_chave + espaco_entre_nos;
                 }
-                // Aumente a coordenada x com base na largura da sutree
                 cur_x += this.pegar_largura_arvore(filho) + espaco_entre_nos;
             }
-            // Ajuste a coordenada x para centralizar acima dos filhos
             if (!no.folha()) {
                 var primeiro = no.filhos[0];
                 var ultimo = no.filhos[no.filhos.length - 1];
@@ -436,13 +343,6 @@ function DesenhaArvoreB(arvore, canvas) {
         }
     }
 
-    /*
-    mover_arvore: move os nós de uma árvore com base em determinados deltas
-         nó: o nó a ser movido (se indefinido, torna-se a raiz)
-         delta_x: delta x (horizontal)
-         delta_y: delta y (vertical)
-    Devoluções: -
-    */
     this.mover_arvore = function (delta_x, delta_y, no) {
         if (no == undefined) {
             no = this.arvore.raiz;
@@ -457,7 +357,6 @@ function DesenhaArvoreB(arvore, canvas) {
     }
 }
 
-/* Manipuladores de eventos */
 function on_botao_inserir_chave_clicked() {
     var chave = parseInt(document.getElementById("entrada_inserir_chave").value);
     if (chave || chave == 0) {
@@ -519,7 +418,7 @@ function on_canvas_clicked(e) {
         y = e.clientY + document.body.scrollTop +
             document.documentElement.scrollTop;
     }
-    // Obter as coordenadas relativamente à tela (canvas)
+
     x = x - canvas.offsetLeft;
     y = y - canvas.offsetTop;
 
@@ -529,26 +428,25 @@ function on_canvas_clicked(e) {
     var height = canvas.height;
     meio_y = canvas.height / 2;
     meio_x = canvas.width / 2;
-    // Rolar para a esquerda
+
     if (x < deslocamento * 2 &&
         meio_y - deslocamento <= y && y <= meio_y + deslocamento)
         delta_x = deslocamento;
-    // Rolar para a direita
+
     else if (x > width - deslocamento * 2 &&
         meio_y - deslocamento <= y && y <= meio_y + deslocamento)
         delta_x = -deslocamento;
-    // Rolar para baixo
+
     else if (y < deslocamento * 2 &&
         meio_x - deslocamento <= x && x <= meio_x + deslocamento)
         delta_y = deslocamento;
-    // Rolar para cima
+
     else if (y > height - deslocamento * 2 &&
         meio_x - deslocamento <= x && x <= meio_x + deslocamento)
         delta_y = -deslocamento;
     desenho.desenhar(rolagem, delta_x, delta_y);
 }
 
-/* Cria uma nova árvore */
 function nova_arvore(ordem) {
     arvore = new ArvoreB(ordem);
     var canvas = document.getElementById("canvas");
@@ -556,7 +454,6 @@ function nova_arvore(ordem) {
     desenho.desenhar();
 }
 
-/* Libera os botões de inserir e remover chave para o uso */
 function liberar_botoes() {
     var ordem = parseInt(document.getElementById("entrada_ordem").value);
     if (ordem >= 3) {
